@@ -165,7 +165,7 @@ class MDPInitializer:
                     transitions[state][action] = {}
                 # Need to alpha * transition[state][action][n_state] as the action corresponds to the desired state
                 transitions[state][action][new_state] = (self.alpha * total_sequence_count / state_count,
-                                                         self.reward(new_state))
+                                                        self.reward(new_state))
 
         # Adding the other possibilities and their probabilities for a particular action
         for state in transitions:
@@ -180,8 +180,8 @@ class MDPInitializer:
                     # Need to beta * transition[state][a][n_state] as the action doesn't correspond to the desired state
                     if new_state not in transitions[state][action]:
                         transitions[state][action][new_state] = (self.beta(action, new_state)
-                                                                 * transitions[state][a][new_state][0],
-                                                                 self.reward(new_state))
+                                                                * transitions[state][a][new_state][0],
+                                                                self.reward(new_state))
 
         # Normalizing the probabilities
         for state in transitions:
@@ -205,7 +205,7 @@ class MDPInitializer:
 
         # The difference in number of hours per unit currency
         diff = abs((self.game_data[action] / self.game_price[action]) -
-                   (self.game_data[new_state[self.k - 1]] / self.game_price[new_state[self.k - 1]]))
+                (self.game_data[new_state[self.k - 1]] / self.game_price[new_state[self.k - 1]]))
         return diff / 120
 
     def reward(self, state):
@@ -214,6 +214,15 @@ class MDPInitializer:
         :param state: the state
         :return: the reward for the given state
         """
+
+        last_game = state[-1]
+        p = game_price[last_game]
+        e = game_data[last_game][0]
+        if p == 0:
+            return e   # If any free game is in your dataset
+        ratio = e / p
+        # Optionally apply a transform to keep values in a reasonable range:
+        return math.log(1 + ratio)  # for example
 
         # spent = 0
         # for i in range(len(state) - 1):
@@ -231,4 +240,4 @@ class MDPInitializer:
         #
         # return (1 - y) * (self.game_data[state[self.k - 1]]) + y * (self.game_price[state[self.k - 1]])
 
-        return 1
+        # return 1

@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Recommender System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h2, h3 {
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* --- Cyber Toggle Switch Styling (From Uiverse.io by chicogale) --- */
+        .view-toggle-container {
+             text-align: center;
+             margin-bottom: 20px;
+             background-color: #e9e9e9;
+             padding: 15px;
+             border-radius: 5px;
+        }
+
+        .cyber-toggle-wrapper {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            padding: 15px; /* Keep some padding around the switch */
+        }
+
+        .cyber-toggle-checkbox {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .cyber-toggle {
+            position: relative;
+            display: inline-block;
+            width: 64px;
+            height: 32px;
+            cursor: pointer;
+        }
+
+        .cyber-toggle-track {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #111;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.5),
+                inset 0 0 4px rgba(0, 0, 0, 0.8);
+            transition: all 0.4s cubic-bezier(0.3, 1.5, 0.7, 1);
+        }
+
+        .cyber-toggle-track::before {
+            content: "";
+            position: absolute;
+            inset: 2px;
+            border-radius: 14px;
+            background: #222;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+            z-index: 0;
+            transition: all 0.4s ease;
+        }
+
+        .cyber-toggle-track-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #03e9f4, #4a00e0);
+            opacity: 0;
+            border-radius: 16px;
+            z-index: 1;
+            transition: all 0.4s ease;
+        }
+
+        .cyber-toggle-thumb {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 24px;
+            height: 24px;
+            background: #151515;
+            border-radius: 50%;
+            z-index: 2;
+            transition: all 0.4s cubic-bezier(0.3, 1.5, 0.7, 1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .cyber-toggle-thumb-shadow {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 30% 30%,
+                rgba(255, 255, 255, 0.1),
+                transparent 70%
+            );
+            z-index: 1;
+        }
+
+        .cyber-toggle-thumb-highlight {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 70% 70%,
+                rgba(0, 0, 0, 0.2),
+                transparent 70%
+            );
+            z-index: 1;
+        }
+
+        .cyber-toggle-thumb-icon {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            opacity: 0.7;
+            transition:
+                opacity 0.4s ease,
+                transform 0.4s ease;
+        }
+
+        .cyber-toggle-thumb-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: #555;
+            transition:
+                fill 0.4s ease,
+                transform 0.4s ease;
+        }
+
+        .cyber-toggle-track-dots {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 10px;
+            z-index: 1;
+        }
+
+        .cyber-toggle-track-dot {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: #444;
+            margin-left: 3px;
+            opacity: 0.5;
+            transition: all 0.4s ease;
+        }
+
+        .cyber-toggle-particles {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .cyber-toggle-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #03e9f4;
+            border-radius: 50%;
+            opacity: 0;
+            filter: blur(1px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 4px rgba(3, 233, 244, 0.8);
+        }
+
+        .cyber-toggle-particle:nth-child(1) {
+            top: 15%;
+            right: 20%;
+        }
+
+        .cyber-toggle-particle:nth-child(2) {
+            top: 45%;
+            right: 30%;
+        }
+
+        .cyber-toggle-particle:nth-child(3) {
+            top: 25%;
+            right: 40%;
+        }
+
+        .cyber-toggle-particle:nth-child(4) {
+            top: 60%;
+            right: 15%;
+        }
+
+        .cyber-toggle-labels {
+            display: flex;
+            justify-content: space-between;
+            width: calc(100% + 30px); /* Extend labels slightly */
+            margin-top: 8px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+             padding: 0 15px; /* Align labels with wrapper padding */
+             box-sizing: border-box;
+        }
+
+        .cyber-toggle-label-off {
+            color: #aaa; /* Default color for OFF label */
+            transition: all 0.4s ease;
+             flex-grow: 1; /* Allow labels to take space */
+             text-align: left;
+        }
+
+        .cyber-toggle-label-on {
+            color: #555; /* Default color for ON label */
+            transition: all 0.4s ease;
+             flex-grow: 1;
+             text-align: right;
+        }
+
+        /* Active states */
+        .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-track-glow {
+            opacity: 0.5;
+        }
+
+        .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-thumb {
+            left: calc(100% - 28px);
+            background: #222;
+        }
+
+        .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-thumb-icon {
+            transform: rotate(360deg);
+        }
+
+        .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-thumb-icon svg {
+            fill: #03e9f4;
+        }
+
+        .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-track-dot {
+            background: #03e9f4;
+            box-shadow: 0 0 4px #03e9f4;
+            opacity: 1;
+        }
+
+        .cyber-toggle-checkbox:checked ~ .cyber-toggle-labels .cyber-toggle-label-on {
+            color: #03e9f4;
+            text-shadow: 0 0 5px rgba(3, 233, 244, 0.5);
+        }
+
+        .cyber-toggle-checkbox:not(:checked)
+            ~ .cyber-toggle-labels
+            .cyber-toggle-label-off {
+            color: #aaa; /* Active color for OFF label */
+             text-shadow: 0 0 5px rgba(170, 170, 170, 0.5);
+        }
+
+        /* Particle animation when active */
+        .cyber-toggle-checkbox:checked + .cyber-toggle .cyber-toggle-particle {
+            opacity: 1;
+            animation: cyber-toggle-float 3s infinite alternate;
+        }
+
+        .cyber-toggle-checkbox:checked
+            + .cyber-toggle
+            .cyber-toggle-particle:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .cyber-toggle-checkbox:checked
+            + .cyber-toggle
+            .cyber-toggle-particle:nth-child(2) {
+            animation-delay: 0.5s;
+        }
+
+        .cyber-toggle-checkbox:checked
+            + .cyber-toggle
+            .cyber-toggle-particle:nth-child(3) {
+            animation-delay: 1s;
+        }
+
+        .cyber-toggle-checkbox:checked
+            + .cyber-toggle
+            .cyber-toggle-particle:nth-child(4) {
+            animation-delay: 1.5s;
+        }
+
+        /* Hover effect */
+        .cyber-toggle:hover .cyber-toggle-track::before {
+            background: #272727;
+        }
+
+        .cyber-toggle:hover .cyber-toggle-thumb {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .cyber-toggle-checkbox:checked + .cyber-toggle:hover .cyber-toggle-track-glow {
+            opacity: 0.7;
+        }
+
+        /* Focus effect for accessibility */
+        .cyber-toggle-checkbox:focus + .cyber-toggle {
+            outline: none;
+        }
+
+        .cyber-toggle-checkbox:focus + .cyber-toggle::after {
+            content: "";
+            position: absolute;
+            inset: -4px;
+            border-radius: 20px;
+            border: 2px solid rgba(3, 233, 244, 0.5);
+            opacity: 0.5;
+        }
+
+        @keyframes cyber-toggle-float {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-4px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+        /* --- End Cyber Toggle Switch Styling --- */
+
+
+        .user-selection, .custom-input-section { /* Renamed custom-recommendations-section to custom-input-section */
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #e9e9e9;
+            border-radius: 5px;
+        }
+
+        .user-selection label, .custom-input-section label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .user-selection select, .custom-input-section input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 5px;
+            box-sizing: border-box; /* Include padding in element's total width */
+        }
+
+        .custom-history-inputs {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 10px; /* Space between inputs */
+            margin-top: 10px;
+             align-items: center; /* Vertically align label and input */
+        }
+        .custom-history-inputs div { /* Wrap label and input in a div */
+            display: flex;
+             align-items: center;
+              gap: 5px;
+        }
+
+
+        .custom-history-inputs input[type="text"] {
+             flex-grow: 1; /* Allow inputs to grow */
+             min-width: 120px; /* Minimum width before wrapping */
+             max-width: 200px; /* Prevent inputs from getting too wide */
+        }
+
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+            margin-top: 10px; /* Add space above the button */
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- Content Display Areas --- */
+         /* Hide both main content areas by default, JavaScript will show the active one */
+        .content-area {
+            display: none;
+            width: 100%;
+            padding: 0; /* Remove padding from this container */
+        }
+
+        .user-profile, .recommendations-display {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Take full width within its container */
+            max-width: none;
+            padding: 0; /* Remove padding from the main container */
+             margin-top: 20px; /* Space between input section and results */
+        }
+
+
+        .profile-header, .recommendations-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+
+        .transactions,
+        .recommendations {
+            padding: 15px; /* Add padding inside these sections */
+        }
+
+        .transaction-item {
+            padding: 10px 0; /* More padding for items */
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .transaction-item:last-child {
+             border-bottom: none; /* Remove border from last item */
+        }
+
+
+        .game-card {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px; /* More space between cards */
+            border: 1px solid #ddd;
+            border-radius: 6px; /* Slightly larger border radius */
+            padding: 10px;
+            background-color: #f9f9f9; /* Slightly different background */
+        }
+         .game-card:last-child {
+             margin-bottom: 0; /* Remove margin from last card */
+        }
+
+
+        .game-thumbnail {
+            width: 70px; /* Slightly smaller thumbnails */
+            height: 70px;
+            object-fit: cover;
+            margin-right: 15px; /* More space between image and text */
+            border-radius: 4px;
+        }
+
+        .game-info {
+            flex-grow: 1;
+        }
+
+        .game-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px; /* Space between title and score */
+            display: block; /* Make title a block element */
+        }
+
+        .game-score {
+            color: #007bff;
+            font-size: 0.9em;
+        }
+
+         /* Style for loading/error messages */
+        #loading-message, #error-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        #loading-message {
+            color: #007bff;
+        }
+
+        #error-message {
+            color: #dc3545; /* Bootstrap danger color */
+            font-weight: bold;
+        }
+
+        /* Specific styles for custom recommendations display */
+        #custom-recommendations-section .recommendations-header { /* Target the header within the custom section */
+             background-color: #28a745; /* Bootstrap success color */
+        }
+         #custom-recommendations-section .game-score { /* Target scores within the custom section */
+             color: #28a745; /* Match header color */
+         }
+
+         /* Style for the custom transactions section header */
+        #custom-transactions-display h4 {
+            margin-top: 0; /* Remove top margin */
+            padding-bottom: 5px; /* Reduce padding */
+            border-bottom: 1px solid #eee; /* Lighter border */
+            margin-bottom: 10px; /* Space below header */
+        }
+
+         /* Media query for responsiveness */
+         @media (max-width: 768px) {
+             .user-profiles {
+                 flex-direction: column; /* Stack items vertically */
+                 gap: 15px;
+             }
+             .user-profile, .recommendations-display {
+                 width: 100%; /* Take full width */
+             }
+             .custom-history-inputs {
+                 flex-direction: column; /* Stack inputs vertically */
+                 gap: 8px;
+             }
+              .custom-history-inputs input[type="text"] {
+                 max-width: none; /* Allow inputs to take full width on small screens */
+             }
+         }
+
+
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>Game Recommender System</h2>
+
+         <div class="view-toggle-container">
+            <h3>Select Recommendation Mode</h3>
+            <div class="cyber-toggle-wrapper">
+                <input class="cyber-toggle-checkbox" id="view-toggle" type="checkbox" />
+                <label class="cyber-toggle" for="view-toggle">
+                  <div class="cyber-toggle-track">
+                    <div class="cyber-toggle-track-glow"></div>
+                    <div class="cyber-toggle-track-dots">
+                      <span class="cyber-toggle-track-dot"></span>
+                      <span class="cyber-toggle-track-dot"></span>
+                      <span class="cyber-toggle-track-dot"></span>
+                    </div>
+                  </div>
+                  <div class="cyber-toggle-thumb">
+                    <div class="cyber-toggle-thumb-shadow"></div>
+                    <div class="cyber-toggle-thumb-highlight"></div>
+                    <div class="cyber-toggle-thumb-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path
+                          d="M16.5 12c0-2.48-2.02-4.5-4.5-4.5s-4.5 2.02-4.5 4.5 2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5zm-4.5 7.5c-4.14 0-7.5-3.36-7.5-7.5s3.36-7.5 7.5-7.5 7.5 3.36 7.5 7.5-3.36 7.5-7.5 7.5zm0-16.5c-4.97 0-9 4.03-9 9h-3l3.89 3.89.07.14 4.04-4.03h-3c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42c1.63 1.63 3.87 2.64 6.36 2.64 4.97 0 9-4.03 9-9s-4.03-9-9-9z"
+                        ></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <div class="cyber-toggle-particles">
+                    <span class="cyber-toggle-particle"></span>
+                    <span class="cyber-toggle-particle"></span>
+                    <span class="cyber-toggle-particle"></span>
+                    <span class="cyber-toggle-particle"></span>
+                  </div>
+                </label>
+                <div class="cyber-toggle-labels">
+                  <span class="cyber-toggle-label-off">Sample Users</span>
+                  <span class="cyber-toggle-label-on">Custom History</span>
+                </div>
+            </div>
+         </div>
+         <div id="loading-message" style="display: none;">Loading data...</div>
+         <div id="error-message" style="display: none;"></div>
+
+
+        <div id="sample-user-content" class="content-area">
+             <div class="user-selection">
+                 <h3>Sample User Selection</h3>
+                 <p>Choose a pre-loaded user below:</p>
+                 <label for="user-select">Select User:</label>
+                 <select id="user-select">
+                     </select>
+             </div>
+
+             <div class="user-profile" id="sample-user-profile">
+                 <div class="profile-header">
+                     <h3>User ID: <span id="user-id-display"></span></h3>
+                 </div>
+                 <div class="transactions">
+                     <h4>Past Transactions:</h4>
+                     <div id="user-transactions">
+                         </div>
+                 </div>
+                 <div class="recommendations">
+                     <h4>Recommendations:</h4>
+                     <div id="user-recommendations">
+                         </div>
+                 </div>
+             </div>
+         </div>
+         <div id="custom-history-content" class="content-area">
+             <div class="custom-input-section">
+                 <h3>Enter Custom History</h3>
+                 <p>Enter the titles of the last 5 games played (most recent last). Leave fields blank for fewer games. Titles must match exactly (case-sensitive).</p>
+                 <div class="custom-history-inputs" id="custom-history-inputs">
+                     <div><label for="game-title-input-1">Game 1:</label> <input type="text" id="game-title-input-1" class="game-title-input" data-index="1"></div>
+                     <div><label for="game-title-input-2">Game 2:</label> <input type="text" id="game-title-input-2" class="game-title-input" data-index="2"></div>
+                     <div><label for="game-title-input-3">Game 3:</label> <input type="text" id="game-title-input-3" class="game-title-input" data-index="3"></div>
+                     <div><label for="game-title-input-4">Game 4:</label> <input type="text" id="game-title-input-4" class="game-title-input" data-index="4"></div>
+                     <div><label for="game-title-input-5">Game 5:</label> <input type="text" id="game-title-input-5" class="game-title-input" data-index="5"></div>
+                 </div>
+                 <button id="get-custom-recommendations">Get Recommendations</button>
+                 <div id="custom-error-message" style="display: none; color: #dc3545; margin-top: 10px;"></div>
+             </div>
+
+             <div class="recommendations-display" id="custom-recommendations-section">
+                 <div class="recommendations-header">
+                     <h3>Custom Recommendations Results</h3>
+                 </div>
+                 <div class="recommendations">
+                     <div id="custom-transactions-display" class="transactions">
+                          <h4>Your Input History (as Transactions):</h4>
+                           <div id="custom-transactions-list">
+                                </div>
+                      </div>
+
+                     <div id="custom-recommendations-list-container">
+                         <h4>Recommendations Based on History:</h4>
+                          <div id="custom-recommendations-list">
+                               </div>
+                      </div>
+                 </div>
+             </div>
+         </div>
+          </div> <script>
+        let usersData = []; // Stores data for pre-loaded users
+        let gameThumbnails = {}; // Stores mapping from game title to thumbnail URL
+        let allGameTitles = []; // Stores a list of all valid game titles for validation
+
+        // Get references to key DOM elements
+        const loadingMessage = document.getElementById('loading-message');
+        const errorMessage = document.getElementById('error-message');
+        const customErrorMessage = document.getElementById('custom-error-message');
+
+        const sampleUserContentDiv = document.getElementById('sample-user-content');
+        const customHistoryContentDiv = document.getElementById('custom-history-content'); // Contains input and results
+
+        const userSelect = document.getElementById('user-select');
+
+        const customHistoryInputsDiv = document.getElementById('custom-history-inputs');
+        const customRecommendationsButton = document.getElementById('get-custom-recommendations');
+
+        const customTransactionsListDiv = document.getElementById('custom-transactions-list'); // New div for custom transactions
+        const customRecommendationsListDiv = document.getElementById('custom-recommendations-list'); // Existing div for custom recommendations list items
+
+        const viewToggle = document.getElementById('view-toggle'); // Reference to the cyber toggle checkbox
+
+
+        // --- Function to Switch Views ---
+        function switchView() {
+            if (viewToggle.checked) { // If toggle is checked (Custom History)
+                sampleUserContentDiv.style.display = 'none';
+                customHistoryContentDiv.style.display = 'block';
+                // When switching TO custom history, ensure the custom results area is visible
+                // (It might have been hidden if the last custom request failed)
+                 document.getElementById('custom-recommendations-section').style.display = 'block';
+
+            } else { // If toggle is not checked (Sample Users)
+                customHistoryContentDiv.style.display = 'none';
+                sampleUserContentDiv.style.display = 'block';
+                // When switching back to sample user, ensure the profile is displayed if usersData exists
+                 if (usersData.length > 0 && userSelect.value) {
+                      displayUserData(userSelect.value); // Redraw the current sample user data
+                 }
+            }
+        }
+
+
+        // --- Initial Data Fetch ---
+        async function fetchInitialData() {
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            // Hide both content areas while loading
+            sampleUserContentDiv.style.display = 'none';
+            customHistoryContentDiv.style.display = 'none';
+
+
+            try {
+                // Fetch sample users data and recommendations
+                const usersResponse = await fetch('/api/users');
+                if (!usersResponse.ok) {
+                    const errorText = await usersResponse.text(); // Get error details
+                    throw new Error(`HTTP error fetching users! Status: ${usersResponse.status}. Details: ${errorText}`);
+                }
+                // Expecting a JSON array like [{userId: "...", transactions: [...], recommendations: [...]}, ...]
+                usersData = await usersResponse.json();
+                console.log("Fetched users data:", usersData); // Debugging
+
+                // Fetch game thumbnail mappings
+                const thumbnailsResponse = await fetch('/api/game_thumbnails');
+                 if (!thumbnailsResponse.ok) {
+                    const errorText = await thumbnailsResponse.text(); // Get error details
+                    throw new Error(`HTTP error fetching thumbnails! Status: ${thumbnailsResponse.status}. Details: ${errorText}`);
+                }
+                 // Expecting a JSON object like {"Game Title": "/static/path/to/image.jpg", ...}
+                gameThumbnails = await thumbnailsResponse.json();
+                console.log("Fetched game thumbnails:", gameThumbnails); // Debugging
+
+                 // Populate all game titles list (assuming gameThumbnails keys are all valid titles)
+                 allGameTitles = Object.keys(gameThumbnails);
+                 console.log("All game titles loaded:", allGameTitles);
+
+
+                populateUserSelect();
+                // Select the first user if available and display their data initially
+                if (usersData.length > 0) {
+                    userSelect.value = usersData[0].userId; // Select the first user
+                    displayUserData(usersData[0].userId); // Display data for the first user
+                    // Initial view will be Sample Users if data loaded
+                    viewToggle.checked = false; // Ensure toggle is set to Sample Users
+                } else {
+                     // If no sample users loaded, default to custom history view
+                     viewToggle.checked = true;
+                     customErrorMessage.textContent = 'No sample user data available from the backend. Please use Custom History below.';
+                     customErrorMessage.style.display = 'block';
+                 }
+
+
+            } catch (error) {
+                console.error("Error fetching initial data:", error);
+                errorMessage.textContent = `Error loading initial data: ${error.message}. Please ensure the backend is running and check server logs.`;
+                errorMessage.style.display = 'block';
+                // Clear any potentially partially loaded data or UI
+                usersData = [];
+                gameThumbnails = {};
+                allGameTitles = [];
+                populateUserSelect(); // Clear select options
+
+                // Default to custom history view if initial data fails
+                viewToggle.checked = true;
+                customErrorMessage.textContent = 'Failed to load sample users. Please use Custom History below.';
+                customErrorMessage.style.display = 'block';
+
+            } finally {
+                loadingMessage.style.display = 'none'; // Hide loading message
+                // After loading (or error), show the appropriate initial view based on toggle state
+                switchView();
+            }
+        }
+
+        // --- Populate User Dropdown ---
+        function populateUserSelect() {
+            userSelect.innerHTML = ''; // Clear existing options
+            if (usersData.length === 0) {
+                 const option = document.createElement('option');
+                 option.value = '';
+                 option.textContent = 'No users available';
+                 userSelect.appendChild(option); // Append to userSelect
+                 userSelect.disabled = true; // Disable select if no users
+                 return;
+            }
+
+            userSelect.disabled = false; // Enable select
+            usersData.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.userId;
+                option.textContent = `User ${user.userId}`;
+                userSelect.appendChild(option);
+            });
+        }
+
+        // --- Display Data for Selected Sample User ---
+        function displayUserData(userId) {
+            // Ensure we are in sample user view before displaying
+            if (viewToggle.checked) {
+                 // If we somehow triggered this while in custom view, just switch the view
+                 viewToggle.checked = false;
+                 switchView();
+                 // Then call displayUserData again after the view is switched
+                 // Use a small timeout to allow the UI to update before re-calling
+                 setTimeout(() => displayUserData(userId), 50);
+                 return;
+             }
+
+            const user = usersData.find(user => user.userId === userId);
+
+            if (!user) {
+                console.warn(`User with ID ${userId} not found in loaded data.`);
+                 document.getElementById('user-id-display').textContent = 'Error';
+                 document.getElementById('user-transactions').innerHTML = '<p>User data not found.</p>';
+                 document.getElementById('user-recommendations').innerHTML = '';
+                return;
+            }
+
+            document.getElementById('user-id-display').textContent = user.userId;
+
+            // Display Transactions
+            const transactionsDiv = document.getElementById('user-transactions');
+            transactionsDiv.innerHTML = ''; // Clear previous transactions
+            if (user.transactions && user.transactions.length > 0) {
+                user.transactions.forEach(transactionTitle => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('transaction-item');
+                     // Lookup thumbnail using the game title, fallback to placeholder
+                    const thumbnailUrl = gameThumbnails[transactionTitle] || '/static/placeholder.jpg'; // Use a default placeholder URL
+                    itemDiv.innerHTML = `
+                        <img src="${thumbnailUrl}" alt="${transactionTitle}" class="game-thumbnail">
+                        <span class="game-title">${transactionTitle}</span>
+                    `;
+                    transactionsDiv.appendChild(itemDiv);
+                });
+            } else {
+                 transactionsDiv.innerHTML = '<p>No transaction history found for this user.</p>';
+            }
+
+
+            // Display Recommendations
+            const recommendationsDiv = document.getElementById('user-recommendations');
+            recommendationsDiv.innerHTML = ''; // Clear previous recommendations
+            if (user.recommendations && user.recommendations.length > 0) {
+                user.recommendations.forEach((recommendation, index) => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.classList.add('game-card');
+                     // Lookup thumbnail using the game title, fallback to placeholder
+                    const thumbnailUrl = gameThumbnails[recommendation.title] || '/static/placeholder.jpg'; // Use a default placeholder URL
+                    cardDiv.innerHTML = `
+                        <img src="${thumbnailUrl}" alt="${recommendation.title}" class="game-thumbnail">
+                        <div class="game-info">
+                            <span class="game-title">Rank ${index + 1}: ${recommendation.title}</span>
+                            <span class="game-score">Score: ${recommendation.score.toFixed(4)}</span> </div>
+                    `;
+                    recommendationsDiv.appendChild(cardDiv);
+                });
+            } else {
+                recommendationsDiv.innerHTML = '<p>No recommendations available for this user.</p>';
+            }
+        }
+
+        // --- Display Custom History as Transactions ---
+        function displayCustomTransactions(titles) {
+             const transactionsDiv = customTransactionsListDiv; // Use the new div for custom transactions
+             transactionsDiv.innerHTML = ''; // Clear previous transactions
+
+             if (titles && titles.length > 0) {
+                 titles.forEach(title => {
+                      const itemDiv = document.createElement('div');
+                      itemDiv.classList.add('transaction-item');
+                      // Lookup thumbnail using the game title, fallback to placeholder
+                     const thumbnailUrl = gameThumbnails[title] || '/static/placeholder.jpg'; // Use a default placeholder URL
+                      itemDiv.innerHTML = `
+                          <img src="${thumbnailUrl}" alt="${title}" class="game-thumbnail">
+                          <span class="game-title">${title}</span>
+                      `;
+                      transactionsDiv.appendChild(itemDiv);
+                 });
+             } else {
+                  transactionsDiv.innerHTML = '<p>No valid transaction history entered.</p>';
+             }
+        }
+
+
+        // --- Handle Custom Recommendations ---
+        async function handleCustomRecommendations() {
+             // Ensure we are in custom history view before processing
+             if (!viewToggle.checked) {
+                 // If triggered while in sample user view, switch the view first
+                 viewToggle.checked = true;
+                 switchView();
+                 // Then call handleCustomRecommendations again after the view is switched
+                 // Use a small timeout to allow the UI to update before re-calling
+                 setTimeout(handleCustomRecommendations, 50);
+                 return;
+             }
+
+
+             customErrorMessage.style.display = 'none';
+             customRecommendationsListDiv.innerHTML = ''; // Clear previous recommendations results
+             // customHistoryDisplayDiv.innerHTML = ''; // History is displayed by displayCustomTransactions
+
+            // 1. Collect history from input fields
+            const inputElements = customHistoryInputsDiv.querySelectorAll('.game-title-input');
+            const customHistoryTitles = [];
+            let validationError = false;
+
+            inputElements.forEach(input => {
+                 const title = input.value.trim();
+                 if (title) {
+                     // Basic validation - check if the entered title is in our known list
+                     if (allGameTitles.includes(title)) {
+                         customHistoryTitles.push(title);
+                     } else {
+                         customErrorMessage.textContent = `Error: Game title "${title}" is not recognized. Please enter exact titles from the list of available games.`;
+                         customErrorMessage.style.display = 'block';
+                         validationError = true;
+                     }
+                 }
+            });
+
+            // If there was a validation error, stop here
+            if (validationError) {
+                 customTransactionsListDiv.innerHTML = ''; // Clear transactions display on error
+                 customRecommendationsListDiv.innerHTML = ''; // Clear recommendations list on error
+                 customHistoryDisplayDiv.innerHTML = ''; // Clear history display on error
+                 return;
+            }
+
+            if (customHistoryTitles.length === 0) {
+                 customErrorMessage.textContent = 'Please enter at least one game title for custom history.';
+                 customErrorMessage.style.display = 'block';
+                 customTransactionsListDiv.innerHTML = ''; // Clear transactions display
+                 customRecommendationsListDiv.innerHTML = ''; // Clear recommendations list
+                 customHistoryDisplayDiv.innerHTML = ''; // Clear history display
+                 return;
+            }
+
+             // Display the entered history as transactions
+             displayCustomTransactions(customHistoryTitles);
+
+            // 2. Send history to backend API
+            try {
+                 customRecommendationsListDiv.innerHTML = '<p>Getting recommendations...</p>'; // Loading message
+
+
+                const response = await fetch('/api/recommendations/custom', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ history: customHistoryTitles }) // Send the array of titles
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => ({ message: 'Unknown error' }));
+                    throw new Error(`HTTP error fetching custom recommendations! Status: ${response.status}. Details: ${errorBody.error || response.statusText}`);
+                }
+
+                const recommendations = await response.json(); // Expecting a JSON array of {title: "...", score: ...}
+                console.log("Fetched custom recommendations:", recommendations); // Debugging
+
+
+                // 3. Display recommendations
+                customRecommendationsListDiv.innerHTML = ''; // Clear loading message/previous results
+                if (recommendations && recommendations.length > 0) {
+                     recommendations.forEach((recommendation, index) => {
+                         const cardDiv = document.createElement('div');
+                         cardDiv.classList.add('game-card');
+                          // Lookup thumbnail using the game title, fallback to placeholder
+                         const thumbnailUrl = gameThumbnails[recommendation.title] || '/static/placeholder.jpg';
+
+                         cardDiv.innerHTML = `
+                             <img src="${thumbnailUrl}" alt="${recommendation.title}" class="game-thumbnail">
+                             <div class="game-info">
+                                 <span class="game-title">Rank ${index + 1}: ${recommendation.title}</span>
+                                 <span class="game-score">Score: ${recommendation.score.toFixed(4)}</span> </div>
+                         `;
+                         customRecommendationsListDiv.appendChild(cardDiv);
+                     });
+                } else {
+                     customRecommendationsListDiv.innerHTML = '<p>No recommendations found for the given history. The state might not be in the trained model, or the input history was too short or invalid.</p>';
+                }
+
+
+            } catch (error) {
+                console.error("Error fetching custom recommendations:", error);
+                customErrorMessage.textContent = `Error getting recommendations: ${error.message}`;
+                customErrorMessage.style.display = 'block';
+                 customRecommendationsListDiv.innerHTML = ''; // Clear recommendations list on error
+                 // Keep the custom transactions list and history display on fetch error
+            }
+        }
+
+
+        // --- Event Listeners ---
+        // Listen for changes in the user select dropdown
+        userSelect.addEventListener('change', (event) => {
+            displayUserData(event.target.value);
+        });
+
+        // Listen for the custom recommendations button click
+        customRecommendationsButton.addEventListener('click', handleCustomRecommendations);
+
+        // Listen for changes in the view toggle switch (using the cyber toggle checkbox)
+        viewToggle.addEventListener('change', switchView);
+
+
+        // --- Initial Load ---
+        fetchInitialData();
+
+    </script>
+
+</body>
+
+</html>
